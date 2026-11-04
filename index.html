@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>tugas-task</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:#1f1f1f;color:#e8eaed;font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+.app{display:flex;height:100vh;height:100dvh}
+.side{width:250px;flex:none;padding:12px 8px;overflow-y:auto;background:#1f1f1f}
+.side.closed{display:none}
+.btn-new{display:flex;align-items:center;gap:10px;background:#303134;padding:14px 20px;border-radius:24px;box-shadow:0 1px 3px rgba(0,0,0,.5);margin:4px 4px 14px;font-weight:500}
+.nav{display:flex;align-items:center;gap:12px;width:100%;padding:8px 16px;border-radius:0 22px 22px 0;text-align:left;color:#e8eaed;cursor:pointer}
+.nav:hover{background:#2b2b2b}
+.nav.active{background:#263a5c;color:#d3e3fd}
+.nav .n{margin-left:auto;color:#9aa0a6;font-size:12px}
+.sec{padding:14px 16px 6px;color:#9aa0a6;font-weight:500;display:flex;justify-content:space-between}
+.lf{display:flex;align-items:center;gap:12px;padding:7px 16px;border-radius:0 22px 22px 0;cursor:pointer}
+.lf:hover{background:#2b2b2b}
+.lf input{accent-color:#8ab4f8;width:16px;height:16px;margin:0}
+.lf b{margin-left:auto;font-weight:400;color:#9aa0a6;font-size:12px}
+hr{border:0;border-top:1px solid #3c4043;margin:10px 12px}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%}
+.top{display:flex;align-items:center;gap:12px;padding:10px 16px;flex-wrap:wrap}
+h1{font-size:22px;font-weight:400;margin:0 6px 0 0}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-left:auto}
+#search{background:#2b2b2b;border:1px solid #3c4043;border-radius:20px;padding:7px 14px;min-width:190px;outline:0}
+#search:focus{border-color:#8ab4f8}
+select,.ghost{background:#2b2b2b;border:1px solid #3c4043;border-radius:8px;padding:7px 10px}
+.ghost:hover{background:#333}
+.primary{background:#8ab4f8;color:#202124;border-radius:8px;padding:8px 14px;font-weight:500}
+.primary:disabled{opacity:.4;cursor:default}
+.chk{display:flex;gap:6px;align-items:center;color:#c4c7c5}
+.icon{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;color:#c4c7c5;flex:none;font-size:15px}
+.icon:hover{background:#3c4043}
+.panel{margin:0 16px 12px;background:#2b2b2b;border-radius:12px;padding:14px;border:1px solid #3c4043}
+.hidden{display:none!important}
+textarea#pasteBox{width:100%;background:#1f1f1f;border:1px solid #3c4043;border-radius:8px;padding:10px;resize:vertical;outline:0}
+.hint{color:#9aa0a6;margin:2px 0 8px;font-size:13px}
+.preview{margin-top:10px;font-size:13px;color:#c4c7c5;max-height:200px;overflow:auto}
+.preview div{padding:3px 0}
+.preview b{color:#8ab4f8;font-weight:500}
+.row{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.board{flex:1;display:flex;gap:16px;align-items:flex-start;padding:8px 16px 24px;overflow:auto;min-height:0}
+.col{flex:0 0 272px;background:#2b2b2b;border-radius:12px;padding:8px 0;max-height:100%;overflow-y:auto}
+.colh{display:flex;align-items:center;gap:2px;padding:4px 8px 4px 16px}
+.colh h2{font-size:16px;font-weight:500;margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.add{display:flex;gap:14px;align-items:center;padding:8px 16px 10px;color:#8ab4f8}
+.add input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#8ab4f8;font-size:14px}
+.add input::placeholder{color:#8ab4f8;opacity:.9}
+.task{padding:6px 10px 6px 12px;margin:0 4px;border-radius:8px}
+.task:hover{background:#353535}
+.trow{display:flex;gap:12px;align-items:flex-start}
+.circle{flex:none;width:18px;height:18px;border:2px solid #9aa0a6;border-radius:50%;margin-top:2px}
+.circle:hover{border-color:#8ab4f8}
+.circle.on{background:#8ab4f8;border-color:#8ab4f8;box-shadow:inset 0 0 0 3px #2b2b2b}
+.circle.sm{width:14px;height:14px;margin-top:3px}
+.tmain{flex:1;min-width:0}
+.ttitle{outline:none;word-break:break-word;padding:1px 3px;margin:0 -3px;border-radius:4px}
+.ttitle:focus{background:#202124}
+.is-done .ttitle{text-decoration:line-through;color:#9aa0a6}
+.due{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:12px;border:1px solid #5f6368;border-radius:12px;padding:1px 8px;color:#c4c7c5}
+.due.over{color:#f28b82;border-color:#f28b82}
+.tacts{display:none;gap:2px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.task:hover .tacts,.task:focus-within .tacts{display:flex}
+@media (hover:none){.tacts{display:flex}}
+.dpick{background:transparent;border:0;color:#c4c7c5;width:24px;color-scheme:dark;cursor:pointer}
+.lnk{font-size:12px;color:#8ab4f8;padding:3px 7px;border-radius:12px;white-space:nowrap;text-decoration:none}
+.lnk:hover{background:#3c4043}
+.sub{display:flex;gap:12px;align-items:flex-start;margin:5px 0 0 30px}
+.addsub{margin:4px 0 2px 30px;color:#8ab4f8;font-size:13px;padding:3px 4px;border-radius:4px}
+.addsub:hover{background:#3c4043}
+details.done{padding:4px 16px 6px}
+details.done summary{cursor:pointer;color:#c4c7c5;padding:6px 0;font-weight:500;list-style:none}
+details.done summary::-webkit-details-marker{display:none}
+details.done summary::before{content:"▸  "}
+details.done[open] summary::before{content:"▾  "}
+details.done .task{margin:0 -12px}
+.empty{color:#9aa0a6;padding:24px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#e8eaed;color:#202124;padding:10px 16px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw}
+#toast.show{opacity:1}
+.grip{display:inline-grid;place-items:center;width:12px;flex:none;margin-top:4px;color:#9aa0a6;opacity:0;cursor:grab;font-size:12px;letter-spacing:-2px;user-select:none;line-height:1;transition:opacity .15s}
+.sub .grip{margin-top:3px}
+.task:hover>.trow>.grip,.sub:hover>.grip{opacity:.8}
+.grip:active{cursor:grabbing}
+.dragging{opacity:.4}
+.dz-before{box-shadow:inset 0 2px 0 #8ab4f8}
+.dz-after{box-shadow:inset 0 -2px 0 #8ab4f8}
+.dz-inside{background:#263a5c!important}
+.col.dz-end{box-shadow:inset 0 0 0 2px #8ab4f8}
+.colempty{margin:6px 12px 4px;padding:14px;border:1px dashed #5f6368;border-radius:10px;color:#9aa0a6;font-size:13px;text-align:center}
+.task{transition:background .15s}
+:focus-visible{outline:2px solid #8ab4f8;outline-offset:2px}
+@media (hover:none){.grip{display:none}}
+@media (max-width:820px){
+  .side{position:fixed;z-index:20;top:0;bottom:0;left:0;box-shadow:0 0 24px #000;background:#1f1f1f}
+  .toolbar{margin-left:0;width:100%}
+  #search{flex:1;min-width:0}
+  .col{flex-basis:86vw}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <button class="btn-new" id="btnNew">＋ Buat</button>
+    <div class="nav active" data-act="showAll">✓ Semua tugas <span class="n" id="allCount"></span></div>
+    <div class="sec"><span>Daftar</span></div>
+    <div id="listFilters"></div>
+    <div class="nav" id="btnNewList" style="margin-top:4px">＋ Buat daftar baru</div>
+    <hr>
+    <div class="nav" id="btnImport">📋 Tempel jadwal</div>
+    <div class="nav" id="btnExport">⬇ Ekspor cadangan (JSON)</div>
+    <label class="nav">📥 Impor cadangan<input type="file" id="importFile" accept="application/json" hidden></label>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <button class="icon" id="menuBtn" title="Menu">☰</button>
+      <h1>tugas-task</h1>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Cari tugas">
+        <select id="dueFilter" aria-label="Filter tanggal">
+          <option value="all">Semua tanggal</option>
+          <option value="overdue">Terlambat</option>
+          <option value="today">Hari ini</option>
+          <option value="week">7 hari ke depan</option>
+          <option value="none">Tanpa tanggal</option>
+        </select>
+        <label class="chk"><input type="checkbox" id="showDone" checked> Tampilkan selesai</label>
+        <button class="ghost" id="icsAll">📅 Ekspor semua (.ics)</button>
+      </div>
+    </header>
+
+    <section class="panel hidden" id="importPanel">
+      <strong>Tempel jadwal</strong>
+      <p class="hint">Tulis nama hari (Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu) lalu tugas dengan "- ". Baris yang menjorok ke dalam menjadi subtugas.</p>
+      <textarea id="pasteBox" rows="8" placeholder="Kamis&#10;- Meet w/ pak adit di gatsu&#10;Jumat:&#10;- present projection ke pa robert"></textarea>
+      <div class="preview" id="preview"></div>
+      <div class="row">
+        <select id="pasteList" aria-label="Pilih daftar"></select>
+        <button class="primary" id="parseBtn" disabled>Tambahkan tugas</button>
+        <button class="ghost" id="pasteCancel">Batal</button>
+      </div>
+    </section>
+
+    <div class="board" id="board"></div>
+  </main>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+const KEY = 'taskboard.v1';
+const DAYS = {senin:1, selasa:2, rabu:3, kamis:4, jumat:5, "jum'at":5, umat:5, sabtu:6, minggu:0};
+const DAY_NAMES = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const DEFAULT_LISTS = ['Intern','Awal','Daily','Thesis','Others','BBCC','Kuliah'];
+const HIDDEN_BY_DEFAULT = ['Awal','Daily'];
+
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 10);
+const p2 = n => String(n).padStart(2, '0');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = d => d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+const todayISO = () => fmt(new Date());
+const parseISO = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (iso, n) => { const d = parseISO(iso); d.setDate(d.getDate() + n); return fmt(d); };
+const dayDiff = iso => Math.round((parseISO(iso) - parseISO(todayISO())) / 864e5);
+const nextWeekday = (dow, from = todayISO()) => addDays(from, (dow - parseISO(from).getDay() + 7) % 7);
+const newTask = (title, due) => ({id: uid(), title, done: false, due: due || null, subs: []});
+
+// ---------- Parser: deterministic, Indonesian weekday headers ----------
+function parseSchedule(text, from = todayISO()) {
+  const out = [];
+  let day = null, last = null;
+  for (const raw of String(text || '').split(String.fromCharCode(10))) {
+    if (!raw.trim()) continue;
+    const body = raw.trim();
+    const indent = raw.match(/^ */)[0].length;
+    const key = body.replace(/[:：]+$/, '').trim().toLowerCase();
+    if (!/^[-*•·]/.test(body) && Object.prototype.hasOwnProperty.call(DAYS, key)) {
+      const dow = DAYS[key];
+      day = {name: DAY_NAMES[dow], due: nextWeekday(dow, from)};
+      last = null;
+      continue;
+    }
+    const m = body.match(/^[-*•·] *(.*)$/);
+    const title = (m ? m[1] : body).trim();
+    if (!title) continue;
+    if (indent >= 2 && last) { last.subs.push({id: uid(), title, done: false}); continue; }
+    last = {id: uid(), title, done: false, due: day ? day.due : null, subs: [], day: day ? day.name : ''};
+    out.push(last);
+  }
+  return out;
+}
+
+// ---------- Calendar export ----------
+const BS = String.fromCharCode(92), NL = String.fromCharCode(10), CR = String.fromCharCode(13);
+const icsEscape = s => String(s).split(BS).join(BS + BS).split(';').join(BS + ';').split(',').join(BS + ',').split(NL).join(BS + 'n');
+const eventDetails = t => t.subs.map(s => '- ' + s.title + (s.done ? ' (selesai)' : '')).join(NL);
+function gcalUrl(t) {
+  const s = t.due.replace(/-/g, ''), e = addDays(t.due, 1).replace(/-/g, '');
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+    + '&text=' + encodeURIComponent(t.title)
+    + '&dates=' + s + '/' + e
+    + '&details=' + encodeURIComponent(eventDetails(t));
+}
+function icsFor(tasks) {
+  const stamp = new Date().toISOString().split('.')[0].replace(/[-:]/g, '') + 'Z';
+  const events = tasks.filter(t => t.due).map(t => [
+    'BEGIN:VEVENT',
+    'UID:' + t.id + '@taskboard',
+    'DTSTAMP:' + stamp,
+    'DTSTART;VALUE=DATE:' + t.due.replace(/-/g, ''),
+    'DTEND;VALUE=DATE:' + addDays(t.due, 1).replace(/-/g, ''),
+    'SUMMARY:' + icsEscape(t.title),
+    t.subs.length ? 'DESCRIPTION:' + icsEscape(eventDetails(t)) : null,
+    'END:VEVENT'
+  ].filter(Boolean).join(CR + NL));
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Task Board//ID', 'CALSCALE:GREGORIAN', ...events, 'END:VCALENDAR'].join(CR + NL);
+}
+function download(name, content, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], {type}));
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+const safeName = s => String(s).replace(/[^A-Za-z0-9_-]+/g, '_') || 'tugas';
+
+// ---------- State ----------
+function defaultState() {
+  return {lists: DEFAULT_LISTS.map(n => ({id: uid(), name: n, visible: !HIDDEN_BY_DEFAULT.includes(n), tasks: []}))};
+}
+function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && Array.isArray(s.lists)) return s;
+  } catch (e) {}
+  return defaultState();
+}
+let state = load();
+const ui = {doneOpen: {}, focusAdd: null, focusSub: null};
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch (e) { toast('Penyimpanan browser tidak tersedia'); }
+}
+function commit() { save(); render(); }
+const findList = id => state.lists.find(l => l.id === id);
+function findTask(lid, tid) {
+  const l = findList(lid);
+  const t = l && l.tasks.find(x => x.id === tid);
+  return t ? {l, t} : null;
+}
+function dueInfo(due) {
+  if (!due) return null;
+  const d = dayDiff(due);
+  if (d === 0) return {label: 'Hari ini', cls: ''};
+  if (d === 1) return {label: 'Besok', cls: ''};
+  if (d === -1) return {label: 'Kemarin', cls: 'over'};
+  if (d < -1) return {label: (-d) + ' hari yang lalu', cls: 'over'};
+  return {label: parseISO(due).toLocaleDateString('id-ID', {weekday: 'short', day: 'numeric', month: 'short'}), cls: ''};
+}
+function dueOK(t, f) {
+  if (f === 'all') return true;
+  if (f === 'none') return !t.due;
+  if (!t.due) return false;
+  const d = dayDiff(t.due);
+  if (f === 'overdue') return d < 0 && !t.done;
+  if (f === 'today') return d === 0;
+  if (f === 'week') return d >= 0 && d <= 7;
+  return true;
+}
+
+// ---------- Rendering ----------
+function render() { renderSide(); renderBoard(); renderPasteLists(); updatePreview(); }
+
+function renderSide() {
+  $('#listFilters').innerHTML = state.lists.map(l => {
+    const n = l.tasks.filter(t => !t.done).length;
+    return `<label class="lf"><input type="checkbox" data-vis="${l.id}" ${l.visible ? 'checked' : ''}><span>${esc(l.name)}</span><b>${n || ''}</b></label>`;
+  }).join('');
+  const total = state.lists.reduce((a, l) => a + l.tasks.filter(t => !t.done).length, 0);
+  $('#allCount').textContent = total || '';
+}
+
+function renderPasteLists() {
+  const sel = $('#pasteList'), prev = sel.value;
+  sel.innerHTML = state.lists.map(l => `<option value="${l.id}">${esc(l.name)}</option>`).join('');
+  if (prev && findList(prev)) sel.value = prev;
+}
+
+function taskEl(l, t) {
+  const di = dueInfo(t.due);
+  const el = document.createElement('div');
+  el.className = 'task' + (t.done ? ' is-done' : '');
+  el.dataset.l = l.id;
+  el.dataset.t = t.id;
+  el.innerHTML = `
+    <div class="trow">
+      <span class="grip" title="Seret untuk memindahkan">⋮⋮</span>
+      <button class="circle${t.done ? ' on' : ''}" data-act="toggle" title="Tandai selesai"></button>
+      <div class="tmain">
+        <div class="ttitle" contenteditable="true" spellcheck="false">${esc(t.title)}</div>
+        ${di ? `<span class="due${di.cls ? ' ' + di.cls : ''}">🕘 ${esc(di.label)}</span>` : ''}
+      </div>
+      <div class="tacts">
+        ${t.due ? `<a class="lnk" href="${gcalUrl(t)}" target="_blank" rel="noopener">+ Kalender</a><button class="lnk" data-act="icsOne">.ics</button>` : ''}
+        <input type="date" class="dpick" value="${t.due || ''}" title="Ubah tanggal">
+        <button class="icon" data-act="delTask" title="Hapus">×</button>
+      </div>
+    </div>
+    ${t.subs.map(s => `<div class="sub${s.done ? ' is-done' : ''}" data-s="${s.id}">
+      <span class="grip" title="Seret untuk memindahkan">⋮⋮</span>
+      <button class="circle sm${s.done ? ' on' : ''}" data-act="toggleSub" title="Tandai"></button>
+      <div class="ttitle" contenteditable="true" spellcheck="false">${esc(s.title)}</div></div>`).join('')}
+    <button class="addsub" data-act="addSub">＋ Tambah subtugas</button>`;
+  return el;
+}
+
+function renderBoard() {
+  const q = $('#search').value.trim().toLowerCase();
+  const dueF = $('#dueFilter').value;
+  const showDone = $('#showDone').checked;
+  const board = $('#board');
+  board.innerHTML = '';
+  const visible = state.lists.filter(l => l.visible);
+  if (!visible.length) {
+    board.innerHTML = '<p class="empty">Centang minimal satu daftar di sidebar.</p>';
+    return;
+  }
+  visible.forEach(l => {
+    const match = t => (!q || t.title.toLowerCase().includes(q) || t.subs.some(s => s.title.toLowerCase().includes(q))) && dueOK(t, dueF);
+    const active = l.tasks.filter(t => !t.done && match(t));
+    const done = l.tasks.filter(t => t.done && match(t));
+    const col = document.createElement('section');
+    col.className = 'col';
+    col.innerHTML = `
+      <header class="colh">
+        <h2 title="${esc(l.name)}">${esc(l.name)}</h2>
+        <button class="icon" data-act="icsList" data-l="${l.id}" title="Ekspor daftar (.ics)">⬇</button>
+        <button class="icon" data-act="renameList" data-l="${l.id}" title="Ganti nama">✎</button>
+        <button class="icon" data-act="delList" data-l="${l.id}" title="Hapus daftar">🗑</button>
+      </header>
+      <div class="add"><span>＋</span><input data-add="${l.id}" placeholder="Tambahkan tugas" aria-label="Tambahkan tugas ke ${esc(l.name)}"></div>`;
+    active.forEach(t => col.appendChild(taskEl(l, t)));
+    if (showDone && done.length) {
+      const d = document.createElement('details');
+      d.className = 'done';
+      d.open = !!ui.doneOpen[l.id];
+      d.addEventListener('toggle', () => { ui.doneOpen[l.id] = d.open; });
+      d.innerHTML = `<summary>Selesai (${done.length})</summary>`;
+      done.forEach(t => d.appendChild(taskEl(l, t)));
+      col.appendChild(d);
+    }
+    if (!active.length && !done.length) {
+      col.insertAdjacentHTML('beforeend', `<p class="colempty">${l.tasks.length ? 'Tidak ada yang cocok dengan filter.' : 'Belum ada tugas. Seret tugas ke sini atau ketik di atas.'}</p>`);
+    }
+    board.appendChild(col);
+  });
+  if (ui.focusAdd) { const i = document.querySelector(`[data-add="${ui.focusAdd}"]`); i && i.focus(); ui.focusAdd = null; }
+  if (ui.focusSub) { const i = document.querySelector(`.sub[data-s="${ui.focusSub}"] .ttitle`); i && i.focus(); ui.focusSub = null; }
+}
+
+function updatePreview() {
+  const items = parseSchedule($('#pasteBox').value);
+  $('#preview').innerHTML = items.map(t =>
+    `<div>${t.day ? `<b>${esc(t.day)}</b> · ` : ''}${esc(t.title)}${t.subs.length ? ` <i>(+${t.subs.length} subtugas)</i>` : ''}</div>`).join('');
+  const btn = $('#parseBtn');
+  btn.disabled = items.length === 0;
+  btn.textContent = items.length ? `Tambahkan ${items.length} tugas` : 'Tambahkan tugas';
+}
+
+// ---------- Toast ----------
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ---------- Events ----------
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.dataset.act;
+  const tEl = el.closest('.task');
+  const lid = el.dataset.l || (tEl && tEl.dataset.l);
+  const r = tEl ? findTask(tEl.dataset.l, tEl.dataset.t) : null;
+
+  if (act === 'showAll') { state.lists.forEach(l => l.visible = true); commit(); }
+  else if (act === 'toggle' && r) { r.t.done = !r.t.done; commit(); }
+  else if (act === 'toggleSub' && r) {
+    const s = r.t.subs.find(x => x.id === el.closest('.sub').dataset.s);
+    if (s) { s.done = !s.done; commit(); }
+  }
+  else if (act === 'delTask' && r) { r.l.tasks = r.l.tasks.filter(x => x !== r.t); commit(); }
+  else if (act === 'addSub' && r) {
+    const s = {id: uid(), title: '', done: false};
+    r.t.subs.push(s);
+    ui.focusSub = s.id;
+    commit();
+  }
+  else if (act === 'icsOne' && r) {
+    download(safeName(r.t.title) + '.ics', icsFor([r.t]), 'text/calendar;charset=utf-8');
+  }
+  else if (act === 'icsList') {
+    const l = findList(lid);
+    if (l) download(safeName(l.name) + '.ics', icsFor(l.tasks), 'text/calendar;charset=utf-8');
+  }
+  else if (act === 'renameList') {
+    const l = findList(lid);
+    const n = l && prompt('Nama daftar', l.name);
+    if (n && n.trim()) { l.name = n.trim(); commit(); }
+  }
+  else if (act === 'delList') {
+    const l = findList(lid);
+    if (l && confirm(`Hapus daftar "${l.name}" beserta ${l.tasks.length} tugasnya?`)) {
+      state.lists = state.lists.filter(x => x !== l);
+      commit();
+    }
+  }
+});
+
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.matches('[data-vis]')) {
+    const l = findList(t.dataset.vis);
+    if (l) { l.visible = t.checked; commit(); }
+  } else if (t.matches('.dpick')) {
+    const tEl = t.closest('.task');
+    const r = findTask(tEl.dataset.l, tEl.dataset.t);
+    if (r) { r.t.due = t.value || null; commit(); }
+  } else if (t.matches('#dueFilter, #showDone')) {
+    renderBoard();
+  }
+});
+
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t.matches('[data-add]') && e.key === 'Enter') {
+    const title = t.value.trim();
+    const l = findList(t.dataset.add);
+    if (!title || !l) return;
+    l.tasks.push(newTask(title, null));
+    ui.focusAdd = l.id;
+    commit();
+  } else if (t.isContentEditable && e.key === 'Enter') {
+    e.preventDefault();
+    t.blur();
+  }
+});
+
+// Save inline title edits without re-rendering (keeps clicks working).
+document.addEventListener('focusout', e => {
+  const t = e.target;
+  if (!t.isContentEditable) return;
+  const tEl = t.closest('.task');
+  const r = tEl && findTask(tEl.dataset.l, tEl.dataset.t);
+  if (!r) return;
+  const text = t.textContent.trim();
+  const subEl = t.closest('.sub');
+  if (subEl) {
+    const s = r.t.subs.find(x => x.id === subEl.dataset.s);
+    if (!s) return;
+    if (!text) { r.t.subs = r.t.subs.filter(x => x !== s); commit(); return; }
+    s.title = text;
+  } else {
+    if (!text) { r.l.tasks = r.l.tasks.filter(x => x !== r.t); commit(); return; }
+    r.t.title = text;
+  }
+  save();
+});
+
+// ---------- Drag and drop: tasks and subtasks ----------
+// Grab the ⋮⋮ handle to drag. Drop on the top/bottom quarter of a task to reorder,
+// on its middle to make it a subtask, on a column to move it to that list's end.
+let drag = null; // {kind:'task'|'sub', lid, tid, sid, el}
+const clearDz = () => document.querySelectorAll('.dz-before,.dz-after,.dz-inside,.dz-end')
+  .forEach(x => x.classList.remove('dz-before', 'dz-after', 'dz-inside', 'dz-end'));
+const zoneOf = (el, e) => {
+  if (el.classList.contains('col')) return 'end';
+  const r = el.getBoundingClientRect();
+  const y = (e.clientY - r.top) / (r.height || 1);
+  if (el.classList.contains('sub')) return y < 0.5 ? 'before' : 'after';
+  return y < 0.25 ? 'before' : y > 0.75 ? 'after' : 'inside';
+};
+function takeTask(src) {
+  const r = findTask(src.lid, src.tid);
+  if (!r) return null;
+  r.l.tasks = r.l.tasks.filter(x => x !== r.t);
+  return r.t;
+}
+function takeSub(src) {
+  const r = findTask(src.lid, src.tid);
+  const s = r && r.t.subs.find(x => x.id === src.sid);
+  if (!s) return null;
+  r.t.subs = r.t.subs.filter(x => x !== s);
+  return s;
+}
+const subFromTask = t => [{id: t.id, title: t.title, done: t.done}, ...t.subs];
+const promote = s => ({id: s.id, title: s.title, done: s.done, due: null, subs: []});
+
+function applyDrop(src, el, pos) {
+  if (el.classList.contains('col')) {
+    const l = findList(el.querySelector('[data-add]').dataset.add);
+    if (!l) return;
+    if (src.kind === 'task') { const t = takeTask(src); if (t) l.tasks.push(t); }
+    else { const s = takeSub(src); if (s) l.tasks.push(promote(s)); }
+    return;
+  }
+  const tr = findTask(el.dataset.l, el.dataset.t);
+  if (!tr) return;
+  if (el.classList.contains('task')) {
+    if (src.kind === 'task' && src.tid === tr.t.id) return;
+    const offset = pos === 'after' ? 1 : 0;
+    if (src.kind === 'task') {
+      const t = takeTask(src);
+      if (!t) return;
+      if (pos === 'inside') tr.t.subs.push(...subFromTask(t));
+      else tr.l.tasks.splice(tr.l.tasks.indexOf(tr.t) + offset, 0, t);
+    } else {
+      const s = takeSub(src);
+      if (!s) return;
+      if (pos === 'inside') tr.t.subs.push(s);
+      else tr.l.tasks.splice(tr.l.tasks.indexOf(tr.t) + offset, 0, promote(s));
+    }
+  } else if (el.classList.contains('sub')) {
+    const sid = el.dataset.s;
+    const offset = pos === 'after' ? 1 : 0;
+    if (src.kind === 'sub') {
+      if (src.sid === sid) return;
+      const s = takeSub(src);
+      if (!s) return;
+      tr.t.subs.splice(tr.t.subs.findIndex(x => x.id === sid) + offset, 0, s);
+    } else {
+      if (src.tid === tr.t.id) return;
+      const t = takeTask(src);
+      if (!t) return;
+      tr.t.subs.splice(tr.t.subs.findIndex(x => x.id === sid) + offset, 0, ...subFromTask(t));
+    }
+  }
+}
+function cleanupDrag() {
+  clearDz();
+  if (drag && drag.el) { drag.el.classList.remove('dragging'); drag.el.draggable = false; }
+  drag = null;
+}
+document.addEventListener('mousedown', e => {
+  const g = e.target.closest && e.target.closest('.grip');
+  const row = g && g.closest('.sub, .task');
+  if (row) row.draggable = true;
+});
+document.addEventListener('mouseup', () => {
+  if (!drag) document.querySelectorAll('[draggable="true"]').forEach(x => x.draggable = false);
+});
+document.addEventListener('dragstart', e => {
+  const row = e.target.closest && e.target.closest('.sub, .task');
+  if (!row || !row.draggable) return;
+  if (row.classList.contains('sub')) {
+    const task = row.closest('.task');
+    drag = {kind: 'sub', lid: task.dataset.l, tid: task.dataset.t, sid: row.dataset.s, el: row};
+  } else {
+    drag = {kind: 'task', lid: row.dataset.l, tid: row.dataset.t, el: row};
+  }
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', 'drag');
+  row.classList.add('dragging');
+});
+document.addEventListener('dragover', e => {
+  if (!drag) return;
+  const el = e.target.closest && e.target.closest('.sub, .task, .col');
+  clearDz();
+  if (!el || el === drag.el || drag.el.contains(el)) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  el.classList.add('dz-' + zoneOf(el, e));
+});
+document.addEventListener('drop', e => {
+  if (!drag) return;
+  const el = e.target.closest && e.target.closest('.sub, .task, .col');
+  if (!el || el === drag.el || drag.el.contains(el)) { cleanupDrag(); return; }
+  e.preventDefault();
+  const pos = zoneOf(el, e);
+  applyDrop(drag, el, pos);
+  cleanupDrag();
+  commit();
+});
+document.addEventListener('dragend', cleanupDrag);
+
+$('#search').addEventListener('input', renderBoard);
+$('#pasteBox').addEventListener('input', updatePreview);
+$('#menuBtn').onclick = () => $('#side').classList.toggle('closed');
+$('#btnNew').onclick = () => { const i = document.querySelector('[data-add]'); if (i) i.focus(); };
+$('#btnNewList').onclick = () => {
+  const n = prompt('Nama daftar baru');
+  if (!n || !n.trim()) return;
+  state.lists.push({id: uid(), name: n.trim(), visible: true, tasks: []});
+  commit();
+};
+$('#btnImport').onclick = () => {
+  $('#importPanel').classList.toggle('hidden');
+  $('#pasteBox').focus();
+};
+$('#pasteCancel').onclick = () => $('#importPanel').classList.add('hidden');
+$('#parseBtn').onclick = () => {
+  const items = parseSchedule($('#pasteBox').value);
+  const l = findList($('#pasteList').value) || state.lists[0];
+  if (!items.length || !l) return;
+  l.visible = true;
+  l.tasks.push(...items.map(({id, title, done, due, subs}) => ({id, title, done, due, subs})));
+  $('#pasteBox').value = '';
+  $('#importPanel').classList.add('hidden');
+  commit();
+  toast(`${items.length} tugas ditambahkan ke ${l.name}`);
+};
+$('#btnExport').onclick = () => download('taskboard-backup.json', JSON.stringify(state, null, 2), 'application/json');
+$('#importFile').onchange = async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try {
+    const s = JSON.parse(await f.text());
+    if (!Array.isArray(s.lists)) throw new Error('bad');
+    state = s;
+    commit();
+    toast('Cadangan dimuat');
+  } catch (err) { toast('File cadangan tidak valid'); }
+  e.target.value = '';
+};
+$('#icsAll').onclick = () => download('semua-tugas.ics', icsFor(state.lists.flatMap(l => l.tasks)), 'text/calendar;charset=utf-8');
+
+if (window.innerWidth <= 820) $('#side').classList.add('closed');
+render();
+</script>
+</body>
+</html>
